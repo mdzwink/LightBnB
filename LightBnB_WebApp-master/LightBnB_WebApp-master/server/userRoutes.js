@@ -26,7 +26,7 @@ module.exports = function(router, database) {
   const login =  function(email, password) {
     return database.getUserWithEmail(email)
     .then(user => {
-      if (bcrypt.compareSync(password, user.password)) {
+      if (bcrypt.compareSync(password, user[0].password)) {
         return user;
       }
       return null;
@@ -42,8 +42,8 @@ module.exports = function(router, database) {
           res.send({error: "error"});
           return;
         }
-        req.session.userId = user.id;
-        res.send({user: {name: user.name, email: user.email, id: user.id}});
+        req.session.userId = user[0].id;
+        res.send({user: {name: user[0].name, email: user[0].email, id: user[0].id}});
       })
       .catch(e => res.send(e));
   });
@@ -59,15 +59,15 @@ module.exports = function(router, database) {
       res.send({message: "not logged in"});
       return;
     }
-
+    console.log("TEST GET /me:", req.session.userId)
     database.getUserWithId(userId)
-      .then(user => {
+    .then(user => {
         if (!user) {
           res.send({error: "no user with that id"});
           return;
         }
-    
-        res.send({user: {name: user.name, email: user.email, id: userId}});
+        
+        res.send({user: {name: user[0].name, email: user[0].email, id: userId}});
       })
       .catch(e => res.send(e));
   });
